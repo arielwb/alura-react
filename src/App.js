@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import './css/pure-min.css';
 import './css/side-menu.css';
 
@@ -11,7 +12,7 @@ class App extends Component {
   
   render() {
     return (
-      <div>
+      <Router>
         <div id="layout">
           <a href="#menu" id="menuLink" className="menu-link">
 
@@ -22,25 +23,35 @@ class App extends Component {
               <a className="pure-menu-heading" href="#">Company</a>
 
               <ul className="pure-menu-list">
-                <li className="pure-menu-item"><a href="#" className="pure-menu-link">Home</a></li>
-                <li className="pure-menu-item"><a href="#" className="pure-menu-link">Authors</a></li>
-                <li className="pure-menu-item"><a href="#" className="pure-menu-link">Books</a></li>
+                <li className="pure-menu-item"><Link  to="/" className="pure-menu-link">Home</Link></li>
+                <li className="pure-menu-item"><Link  to="/authors" className="pure-menu-link">Authors</Link></li>
+                <li className="pure-menu-item"><Link  to="/books" className="pure-menu-link">Books</Link></li>
               </ul>
             </div>
           </div>
           <div id="main">
-            <div className="header">
-              <h1>Cadastro de Autores</h1>
-            </div>
-              <AuthorContainer />
+            
+            <Route exact path="/" component={Home} />
+            <Route path="/authors" component={AuthorContainer} />
+            <Route path="/books" component={Books} />
           </div>
 
         </div>
-      </div>
+      </Router>
 
 
     );
   }
 }
+const Home = () => (
+  <div>
+    <h2>Home</h2>
+  </div>
+);
+const Books = () => (
+  <div>
+    <h2>Books</h2>
+  </div>
+);
 
 export default App;

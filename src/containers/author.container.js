@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
+import PubSub from 'pubsub-js';
+
 import { InputComponent, TableComponent } from '../components';
 import { Author, Livro } from '../models';
 import api from '../services/api';
+import { ErrorHelper } from '../helpers';
 
 export default class AuthorContainer extends Component {
 
@@ -19,6 +22,10 @@ export default class AuthorContainer extends Component {
     }
 
     componentDidMount() {
+        PubSub.subscribe('updateAuthors', (topic, authors) => {
+            this.setState({ authors: authors })
+        })
+
         api.getAuthors()
             .then((authors) => this.updateAuthorsState(authors))
             .catch(error => console.log(error));
@@ -26,18 +33,31 @@ export default class AuthorContainer extends Component {
 
     onFormSubmit(event) {
         event.preventDefault();
+        ErrorHelper.clear();
         api.setAuthors(
             {
                 nome: this.state.nome,
                 email: this.state.email,
                 senha: this.state.senha
             })
-            .then(authors => this.updateAuthorsState(authors))
-            .catch(error => console.log(error))
+            .then((response) => {
+                if (response.status === 200) {
+                    this.updateAuthorsState(response)
+                }
+                else {
+                    ErrorHelper.handle(response.errors);
+                }
+            })
+            .catch(response => {
+                console.log('catch', response)
+            })
     }
 
     updateAuthorsState(rawAuthors) {
-        this.setState({ authors: rawAuthors.map((author) => new Author(author)).reverse() })
+        if (!rawAuthors) return false;
+
+        let authors = rawAuthors.map((author) => new Author(author)).reverse().slice(0, 5);
+        PubSub.publish('updateAuthors', authors)
     }
 
     formSet(event) {
@@ -45,10 +65,13 @@ export default class AuthorContainer extends Component {
     }
 
     render() {
-        let values = this.state.authors.slice(0, 5);
-        let headers = ['Nome', 'Email', 'id']
+        let values = this.state.authors;
+        let headers = ['Nome', 'Email', 'id'];
         return (
             <div className="content" id="content">
+                <div className="header">
+                    <h1>Cadastro de Autores</h1>
+                </div>
                 <div className="pure-form pure-form-aligned">
                     <form className="pure-form pure-form-aligned" onSubmit={this.onFormSubmit}>
                         <InputComponent label="Nome" id="nome" type="text" onchange={this.formSet} />
@@ -59,7 +82,6 @@ export default class AuthorContainer extends Component {
                             <button type="submit" className="pure-button pure-button-primary">Gravar</button>
                         </div>
                     </form>
-
                 </div>
                 <div>
                     <TableComponent values={values} headers={headers} />
