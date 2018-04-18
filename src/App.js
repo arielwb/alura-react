@@ -8,14 +8,7 @@ import AuthorContainer from './containers/author.container';
 
 
 class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      authors: [],
-      books: []
-    }
-  }
-
+  
   render() {
     return (
       <div>
@@ -39,31 +32,7 @@ class App extends Component {
             <div className="header">
               <h1>Cadastro de Autores</h1>
             </div>
-            <div className="content" id="content">
-            <AuthorContainer/>
-              <div>
-                <table className="pure-table">
-                  <thead>
-                    <tr>
-                      <th>Nome</th>
-                      <th>Email</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {
-                      this.state.authors.reverse().map((author, key) => {
-                        return (
-                          <tr key={key}>
-                            <td>{author.nome}</td>
-                            <td>{author.email}</td>
-                          </tr>
-                        );
-                      })
-                    }
-                  </tbody>
-                </table>
-              </div>
-            </div>
+              <AuthorContainer />
           </div>
 
         </div>
