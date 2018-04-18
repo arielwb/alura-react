@@ -8,9 +8,9 @@ export default class AuthorContainer extends Component {
     constructor() {
         super();
         this.state = {
-            nome: "teste",
-            email: "teste@test",
-            senha: 123,
+            nome: "",
+            email: "",
+            senha: "",
             authors: []
         }
 
@@ -20,7 +20,8 @@ export default class AuthorContainer extends Component {
 
     componentDidMount() {
         api.getAuthors()
-            .then((authors) => this.setState({ authors: authors.map((author) => new Author(author)) }));
+            .then((authors) => this.updateAuthorsState(authors))
+            .catch(error => console.log(error));
     }
 
     onFormSubmit(event) {
@@ -31,24 +32,28 @@ export default class AuthorContainer extends Component {
                 email: this.state.email,
                 senha: this.state.senha
             })
-            .then(authors => this.setState({ authors: authors.map((author) => new Author(author)) }))
+            .then(authors => this.updateAuthorsState(authors))
             .catch(error => console.log(error))
-        console.log(event)
     }
 
-    formSet(event, key) {
-        let obj = Object.defineProperty({}, key, { value: event.target.value });
-        this.setState(obj);
+    updateAuthorsState(rawAuthors) {
+        this.setState({ authors: rawAuthors.map((author) => new Author(author)).reverse() })
+    }
+
+    formSet(event) {
+        this.setState({ [event.target.id]: event.target.value });
     }
 
     render() {
+        let values = this.state.authors.slice(0, 5);
+        let headers = ['Nome', 'Email', 'id']
         return (
             <div className="content" id="content">
                 <div className="pure-form pure-form-aligned">
                     <form className="pure-form pure-form-aligned" onSubmit={this.onFormSubmit}>
-                        <InputComponent label="Nome" id="nome" type="text" onchange={(event) => this.formSet(event, 'nome')} />
-                        <InputComponent label="E-mail" id="email" type="email" onchange={(event) => this.formSet(event, 'email')} />
-                        <InputComponent label="Senha" id="senha" type="password" onchange={(event) => this.formSet(event, 'senha')} />
+                        <InputComponent label="Nome" id="nome" type="text" onchange={this.formSet} />
+                        <InputComponent label="E-mail" id="email" type="email" onchange={this.formSet} />
+                        <InputComponent label="Senha" id="senha" type="password" onchange={this.formSet} />
                         <div className="pure-control-group">
                             <label></label>
                             <button type="submit" className="pure-button pure-button-primary">Gravar</button>
@@ -56,7 +61,9 @@ export default class AuthorContainer extends Component {
                     </form>
 
                 </div>
-                <TableComponent values={this.state.authors} headers={['Nome', 'Email']} />
+                <div>
+                    <TableComponent values={values} headers={headers} />
+                </div>
             </div>
         );
     }
