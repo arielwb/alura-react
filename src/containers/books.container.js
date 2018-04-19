@@ -2,19 +2,19 @@ import React, { Component } from 'react';
 import PubSub from 'pubsub-js';
 
 import { InputComponent, TableComponent } from '../components';
-import { Author } from '../models';
+import { Book } from '../models';
 import api from '../services/api';
 import { ErrorHelper } from '../helpers';
 
-export default class AuthorContainer extends Component {
+export default class BooksContainer extends Component {
 
     constructor() {
         super();
         this.state = {
-            nome: "",
-            email: "",
-            senha: "",
-            authors: []
+            preco: 0,
+            titulo: '',
+            autorId: 0,
+            books: []
         }
 
         this.formSet = this.formSet.bind(this);
@@ -22,44 +22,45 @@ export default class AuthorContainer extends Component {
     }
 
     componentDidMount() {
-        PubSub.subscribe('updateAuthors', (topic, authors) => {
-            this.setState({ authors: authors })
+        PubSub.subscribe('updateBooks', (topic, books) => {
+            this.setState({ books: books })
         })
 
-        api.getAuthors()
-            .then((authors) => this.updateAuthorsState(authors))
+        api.getBooks()
+            .then((books) => this.updateBooksState(books))
             .catch(error => console.log(error));
     }
 
     onFormSubmit(event) {
         event.preventDefault();
         ErrorHelper.clear();
-        api.setAuthor(
+        api.setBook(
             {
-                nome: this.state.nome,
-                email: this.state.email,
-                senha: this.state.senha
+                titulo: this.state.titulo,
+                preco: this.state.preco,
+                autorId: this.state.autorId
             })
             .then((response) => {
-                
+                console.log(response)
+
                 if (response.errors) {
                     ErrorHelper.handle(response.errors);
                 }
-                else{
-                    this.updateAuthorsState(response)
+                else {
+                    this.updateBooksState(response)
                 }
             })
             .catch(response => {
-                console.log(response)
-                ErrorHelper.handle(response.errors);
+                console.log('catch', response)
             })
     }
 
-    updateAuthorsState(rawAuthors) {
-        if (!rawAuthors) return false;
+    updateBooksState(rawBooks) {
+        if (!rawBooks) return false;
 
-        let authors = rawAuthors.map((author) => new Author(author)).reverse().slice(0, 5);
-        PubSub.publish('updateAuthors', authors)
+        let books = rawBooks.map((book) => new Book(book)).reverse().slice(0, 5);
+        console.log(books)
+        PubSub.publish('updateBooks', books)
     }
 
     formSet(event) {
@@ -67,18 +68,23 @@ export default class AuthorContainer extends Component {
     }
 
     render() {
-        let values = this.state.authors;
-        let headers = ['Nome', 'Email', 'id'];
+        let values = this.state.books.map(book => {
+            let newbook = Object.assign({}, book);
+            newbook.autor = book.autor.nome;
+            return newbook;
+        });
+        console.log(values)
+        let headers = ['Titulo', 'Preco', 'id', 'Autor'];
         return (
             <div className="content" id="content">
                 <div className="header">
-                    <h1>Cadastro de Autores</h1>
+                    <h1>Cadastro de Livros</h1>
                 </div>
                 <div className="pure-form pure-form-aligned">
                     <form className="pure-form pure-form-aligned" onSubmit={this.onFormSubmit}>
-                        <InputComponent label="Nome" id="nome" type="text" onChange={this.formSet} />
-                        <InputComponent label="E-mail" id="email" type="email" onChange={this.formSet} />
-                        <InputComponent label="Senha" id="senha" type="password" onChange={this.formSet} />
+                        <InputComponent label="Titulo" id="titulo" type="text" onChange={this.formSet} />
+                        <InputComponent label="Preco" id="preco" type="number" onChange={this.formSet} />
+                        <InputComponent label="Autor" id="autorId" type="number" onChange={this.formSet} />
                         <div className="pure-control-group">
                             <label></label>
                             <button type="submit" className="pure-button pure-button-primary">Gravar</button>

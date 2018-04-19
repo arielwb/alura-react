@@ -5,12 +5,23 @@ export default class InputComponent extends Component {
 
     constructor() {
         super();
+        
         this.state = {
-            error: ""
+            error: "",
+            label: '',
+            input: []
         };
     }
 
     componentDidMount() {
+        let inputOpt = Object.assign({}, this.props)
+        if(inputOpt.label){
+            delete inputOpt.label
+        }
+        this.setState({
+            label: this.props.label,
+            input: inputOpt
+        })
         PubSub.subscribe('validationError', (topic, error) => {
             if (error.field === this.props.id) {
                 this.updateErrorState(error.defaultMessage);
@@ -28,13 +39,8 @@ export default class InputComponent extends Component {
     render() {
         return (
             <div className="pure-control-group">
-                <label htmlFor={this.props.id}>{this.props.label}</label>
-                <input
-                    id={this.props.id}
-                    type={this.props.type}
-                    name={this.props.id}
-                    value={this.props.value}
-                    onChange={this.props.onchange} />
+                <label htmlFor={this.state.input.id}>{this.state.label}</label>
+                <input {...this.state.input} />
                 <span className="error">{this.state.error}</span>
             </div>
         );

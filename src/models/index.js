@@ -1,7 +1,7 @@
 import Author from './Author';
-import Livros from './Livros';
+import Book from './Book';
 
 export {
     Author,
-    Livros
+    Book
 }
