@@ -1,7 +1,7 @@
-// import InputComponent from './input.component';
-// import TableComponent from './table.component';
+import HeaderComponent from './header.component';
+import FotoComponent from './foto/foto.component';
 
-// export {
-//     InputComponent,
-//     TableComponent
-// }
+export {
+    HeaderComponent,
+    FotoComponent
+}
