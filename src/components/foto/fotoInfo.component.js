@@ -2,16 +2,21 @@ import React, { Component } from 'react';
 
 export default class FotoInfoComponent extends Component {
 
+
     render() {
+        let likers = this.props.likers || [];
+        console.log(likers)
         return (
             <div className="foto-info">
                 <div className="foto-info-likes">
 
-                    <a href="#">alots_ssa</a>
-                    <span>,</span>
-
-                    <a href="#">rafael_rollo</a>
-                    <span>curtiram</span>
+                    {
+                        likers.map((liker, i) => {
+                            let name = liker + (i < likers.length - 1 ? <span>, </span> : '');
+                            return (<a>{name}</a>)
+                        })
+                    }
+                    <span>{likers.length > 0 ? 'curtiram' : ''}</span>
 
                 </div>
 
