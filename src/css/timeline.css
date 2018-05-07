@@ -186,7 +186,7 @@
         margin-right: 1em;
       }
       
-      .fotoAtualizacoes-like:hover {
+      .fotoAtualizacoes-like:hover, .fotoAtualizacoes-like-ativo {
         background-image: url(../img/s2-check.png)
       }
 

@@ -1,35 +1,39 @@
 import React, { Component } from 'react';
+import { Link } from "react-router-dom";
 
 export default class FotoInfoComponent extends Component {
 
-
     render() {
-        let likers = this.props.likers || [];
-        console.log(likers)
+        let likers = this.props.foto.likers || [];
         return (
             <div className="foto-info">
                 <div className="foto-info-likes">
-
                     {
                         likers.map((liker, i) => {
-                            let name = liker + (i < likers.length - 1 ? <span>, </span> : '');
-                            return (<a>{name}</a>)
+                            let name = liker.login + (i < likers.length - 1 ? ', ' : '');
+                            return (<Link key={i} to={'/timeline/' + liker.login}>{name}</Link>)
                         })
                     }
-                    <span>{likers.length > 0 ? 'curtiram' : ''}</span>
+                    <span>{likers.length > 0 ? (likers.length === 1 ? ' curtiu' : ' curtiram') : ''}</span>
 
                 </div>
 
                 <p className="foto-info-legenda">
-                    <a className="foto-info-autor">autor </a>
-                    <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est, illo?</span>
+                    <Link className="foto-info-autor" to={'/timeline/' + this.props.foto.nome}>{this.props.foto.loginUsuario}</Link>
+                    <span>{this.props.foto.comentario}</span>
                 </p>
 
                 <ul className="foto-info-comentarios">
-                    <li className="comentario">
-                        <a className="foto-info-autor">seguidor </a>
-                        <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est, illo?</span>
-                    </li>
+                    {
+                        this.props.foto.comentarios.map((comment, index) => {
+                            return (
+                                <li className="comentario" key={index}>
+                                    <Link className="foto-info-autor" to={'/timeline/' + comment.login}>{comment.login}</Link>
+                                    <span style={{marginLeft: '5px'}}>{comment.texto}</span>
+                                </li>
+                            );
+                        })
+                    }
                 </ul>
             </div>
         );

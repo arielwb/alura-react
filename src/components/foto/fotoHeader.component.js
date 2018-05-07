@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from "react-router-dom";
 
 export default class FotoHeaderComponent extends Component {
 
@@ -8,7 +9,7 @@ export default class FotoHeaderComponent extends Component {
                 <figure className="foto-usuario">
                     <img src={this.props.avatar} alt="foto do usuario" />
                     <figcaption className="foto-usuario">
-                        <a >{this.props.nome}</a>
+                        <Link to={'/timeline/' + this.props.nome}>{this.props.nome}</Link>
                     </figcaption>
                 </figure>
                 <time className="foto-data">{this.props.data}</time>

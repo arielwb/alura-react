@@ -1,22 +1,28 @@
 import React, { Component } from 'react';
-import { BrowserRouter as Router, Route, } from "react-router-dom";
+import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 
 import './css/reset.css';
 import './css/timeline.css';
 import './css/login.css';
 
-import { HeaderComponent } from './components'
 import { TimelineContainer, LoginContainer } from './containers'
+import api from './services/api';
+import { Timeline } from './stores';
 
+const store = new Timeline();
 
 class App extends Component {
 
     render() {
+
         return (
             <Router>
                 <div>
                     <Route exact path="/" component={LoginContainer} />
-                    <Route path="/timeline" component={Timeline} />
+                    <Route path="/timeline/:user?" render={props => (
+                        <TimelineContainer  {...props} store={store} />
+                    )} />
+                    <Route path="/logout" component={Logout} />
                 </div>
             </Router>
         );
@@ -26,12 +32,12 @@ class App extends Component {
 export default App;
 
 
-const Timeline = () => (
-    <div id="root">
-        <div className="main">
-            <HeaderComponent />
-            <TimelineContainer />
-        </div>
-    </div>
-)
+class Logout extends Component {
+    componentWillMount() {
+        api.logout();
+    }
 
+    render() {
+        return (<Redirect to="/" />);
+    }
+}

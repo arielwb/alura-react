@@ -12,8 +12,8 @@ export default class FotoComponent extends Component {
             <div className="foto">
                 <FotoHeaderComponent avatar={this.props.foto.urlPerfil} nome={this.props.foto.loginUsuario} data={this.props.foto.horario}/>
                 <img alt="foto" className="foto-src" src={this.props.foto.urlFoto} />
-                <FotoInfoComponent likers={this.props.foto.likers}/>
-                <FotoAtualizacoesComponent />
+                <FotoInfoComponent foto={this.props.foto}/>
+                <FotoAtualizacoesComponent {...this.props} />
             </div>
         );
     }
