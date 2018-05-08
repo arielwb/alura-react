@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import { createStore, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux';
+import thunkMiddleware from 'redux-thunk';
 
 import './css/reset.css';
 import './css/timeline.css';
@@ -7,30 +10,26 @@ import './css/login.css';
 
 import { TimelineContainer, LoginContainer } from './containers'
 import api from './services/api';
-import { Timeline } from './stores';
+import reducer from './reducers/index';
 
-const store = new Timeline();
+const store = createStore(reducer, applyMiddleware(thunkMiddleware));
 
-class App extends Component {
+export default class App extends Component {
 
     render() {
-
         return (
-            <Router>
-                <div>
-                    <Route exact path="/" component={LoginContainer} />
-                    <Route path="/timeline/:user?" render={props => (
-                        <TimelineContainer  {...props} store={store} />
-                    )} />
-                    <Route path="/logout" component={Logout} />
-                </div>
-            </Router>
+            <Provider store={store}>
+                <Router>
+                    <div>
+                        <Route exact path="/" component={LoginContainer} />
+                        <Route path="/timeline/:user?" component={TimelineContainer} />
+                        <Route path="/logout" component={Logout} />
+                    </div>
+                </Router>
+            </Provider>
         );
     }
 }
-
-export default App;
-
 
 class Logout extends Component {
     componentWillMount() {

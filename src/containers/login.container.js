@@ -1,38 +1,26 @@
 import React, { Component } from 'react';
 import api from '../services/api';
 import { Redirect } from "react-router-dom";
+import { connect } from 'react-redux';
+
+import Login from '../services/login'
 
 
-export default class LoginContainer extends Component {
+class LoginContainer extends Component {
 
-    constructor() {
-        super();
-        this.state = {
-            msg: '',
-            logged: false
+    componentWillReceiveProps(nextProps){
+        if(!!nextProps.token){
+            api.setToken(nextProps.token)
         }
     }
 
     login(event) {
         event.preventDefault();
-        api.login(this.user.value, this.senha.value)
-            .then(response => {
-                if (response.ok) {
-                    return response.text();
-                }
-                else {
-                    throw new Error('Não foi possível efetuar login');
-                }
-            })
-            .then(json => {
-                api.setToken(json);
-                this.setState({ logged: true });
-            })
-            .catch(err => this.setState({ msg: err.message }))
+        this.props.login(this.user.value, this.senha.value)
     }
 
     render() {
-        if (this.state.logged) {
+        if (this.props.token) {
             return (<Redirect to='/timeline' />);
         }
         return (
@@ -47,3 +35,20 @@ export default class LoginContainer extends Component {
         );
     }
 }
+
+
+const mapStateToProps = state => {
+    return { token: state.loginReducer }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        login: (user, pass) => {
+            dispatch(Login.login(user, pass))
+        }
+    }
+}
+
+
+const LoginGlue = connect(mapStateToProps, mapDispatchToProps)(LoginContainer)
+export default LoginGlue;

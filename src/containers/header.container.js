@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom";
-import api from '../services/api';
-import PubSub from 'pubsub-js'
+import { connect } from 'react-redux';
 
-export default class HeaderContainer extends Component {
+import Timeline from '../services/timeline';
+
+ class HeaderContainer extends Component {
+
+
     submit(event) {
         event.preventDefault();
-        api.search(this.searchText.value)
-            .then(response => api.handleResponse(response, 'Erro na busca'))
-            .then(result => PubSub.publish('timeline', result))
-            .catch (err => console.log(err))
+        this.props.search(this.searchText.value);
     }
 
     render() {
@@ -23,16 +23,11 @@ export default class HeaderContainer extends Component {
                     <input type="text" name="search" placeholder="Pesquisa" className="header-busca-campo" ref={input => this.searchText = input} />
                     <input type="submit" value="Buscar" className="header-busca-submit" />
                 </form>
-
-
+                <span>{this.props.msg}</span>
                 <nav>
                     <ul className="header-nav">
                         <li className="header-nav-item">
-                            <a href="#">
-                                ♡
-                    {/*                 ♥ */}
-                                {/* Quem deu like nas minhas fotos */}
-                            </a>
+                            <a>♡</a>
                         </li>
                     </ul>
                 </nav>
@@ -41,3 +36,19 @@ export default class HeaderContainer extends Component {
     }
 }
 
+
+const mapStateToProps = state => {
+    return  { msg: state.notificationReducer }
+ }
+ 
+ const mapDispatchToProps = dispatch => {
+     return {
+         search: (text) => {
+             dispatch(Timeline.search(text));
+         }
+     }
+ }
+ 
+  
+const HeaderGlue = connect(mapStateToProps, mapDispatchToProps)(HeaderContainer)
+export default HeaderGlue;

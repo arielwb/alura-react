@@ -1,54 +1,50 @@
 import React, { Component } from 'react';
 import { Redirect } from "react-router-dom";
-import api from '../services/api';
+import { connect } from 'react-redux';
 
+import api from '../services/api';
 import { FotoComponent } from '../components'
 import { HeaderContainer } from './';
+import Timeline from '../services/timeline';
 
 
-export default class TimelineContainer extends Component {
+class TimelineContainer extends Component {
     constructor(props) {
         super(props);
-        
         this.user = this.props.match.params.user;
-        this.canViewTimeline = !!this.props.user || api.hasToken();
+        this.canViewTimeline = !!this.user || api.hasToken();
 
-    }
-
-    componentWillMount() {
-        this.props.store.subscribe((fotos) => {
-            this.setState({ fotos });
-        })
+        console.log(this.props)
     }
 
     componentDidMount() {
-        this.populateTimeline();
+        if (this.canViewTimeline) {
+            this.populateTimeline();
+        }
     }
 
     componentWillReceiveProps(nextProps) {
-
-        this.user = nextProps.match.params.user;
-        this.populateTimeline();
+        console.log(nextProps)
+        if (this.user !== nextProps.match.params.user) {
+            this.user = nextProps.match.params.user;
+            this.populateTimeline();
+        }
     }
 
     populateTimeline() {
         let promise = this.user ? api.getFotosByUser(this.user) : api.getTimeline();
-        this.props.store.get(promise);
-    }
-
-    like(fotoId) {
-        this.props.store.like(fotoId);
+        this.props.lista(promise);
     }
 
     render() {
-
+        console.log('test')
         return this.canViewTimeline ?
             (<div id="root">
                 <div className="main">
-                    <HeaderContainer store={this.props.store} />
+                    <HeaderContainer />
                     <div className="fotos container">
                         {
-                            this.props.store.fotos.map((foto, index) => <FotoComponent foto={foto} key={index} like={this.like.bind(this)} comenta={this.comenta} />)
+                            this.props.fotos.map((foto, index) => <FotoComponent foto={foto} key={index} like={this.props.like} comenta={this.props.comenta} />)
                         }
                     </div>
                 </div>
@@ -57,3 +53,26 @@ export default class TimelineContainer extends Component {
     }
 }
 
+const mapStateToProps = state => {
+    return { fotos: state.timelineReducer }
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        like: fotoId => {
+            console.log('like')
+            dispatch(Timeline.like(fotoId));
+        },
+        comenta: (fotoId, textoComentario) => {
+            console.log('comenta')
+            dispatch(Timeline.comenta(fotoId, textoComentario));
+        },
+        lista: promise => {
+            dispatch(Timeline.getList(promise));
+        }
+    }
+}
+
+const TimelineGlue = connect(mapStateToProps, mapDispatchToProps)(TimelineContainer)
+
+export default TimelineGlue;

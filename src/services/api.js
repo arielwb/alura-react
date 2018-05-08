@@ -29,7 +29,7 @@ export default class Api {
 
         return fetch(`${url}/fotos/${fotoId}/comment`, requestInfo)
     }
-  
+
     static search(texto) {
         return fetch(`${url}/public/fotos/${texto}`)
     }
@@ -44,7 +44,7 @@ export default class Api {
             method: 'POST',
             headers: Api.getHeaders()
         })
-        
+
     }
 
     static getHeaders() {
@@ -63,6 +63,7 @@ export default class Api {
     }
 
     static setToken(token) {
+        if (!token) throw new Error('Token cannot be ' + typeof token)
         localStorage.setItem('token', token);
     }
 
@@ -75,7 +76,7 @@ export default class Api {
     }
 
     static handleResponse(response, errorMsg) {
-        if(!response) throw new Error('Need a reponse');
+        if (!response) throw new Error('Need a reponse');
         if (!response.ok) throw new Error(errorMsg || 'Error');
         return response.json();
     }
